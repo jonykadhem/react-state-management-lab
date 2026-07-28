@@ -38,6 +38,25 @@ function App() {
 );
 const [shoppingCart, setShoppingCart] = useState([]);
 const [availableBalance, setAvailableBalance] = useState(100);
+const [warningMessage, setWarningMessage] = useState("");
+
+function handleAddToCart(item) {
+  if (availableBalance >= item.price) {
+    setAvailableItems(availableItems.filter((i) => i.id !== item.id));
+    setShoppingCart([...shoppingCart, item]);
+    setAvailableBalance(availableBalance - item.price);
+  } else {
+    setWarningMessage("Insufficient funds. Your balance is too low to purchase this item");
+    setTimeout(() => {
+      setWarningMessage("");
+    }, 4000);
+  }
+}
+  function handleRemoveFromCart(item) {
+    setShoppingCart(shoppingCart.filter((i) => i.id !== item.id));
+    setAvailableItems([...availableItems, item]);
+    setAvailableBalance(availableBalance + item.price);
+  }
 
   return (
     <div>
@@ -46,10 +65,34 @@ const [availableBalance, setAvailableBalance] = useState(100);
 <h2>Your Balance: {availableBalance}</h2>
 
 <h2>Available Items</h2>
+{availableItems.length === 0 ? (
+  <p>No items available.</p>
+) : (
+  availableItems.map((item) => (
+    <div key={item.id}>
+      <p>{item.name} - BD{item.price}</p>
+      <button onClick ={()=>{handleAddToCart(item)}}>Add to Cart</button>
+    </div>
+    ))
+  
+)}
 
 <h2>Shopping Cart</h2>
+{shoppingCart.length === 0 ? (
+  <p>Your shopping cart is empty.</p>
+) : (
+  shoppingCart.map((item) => (
+    <div key={item.id}>
+      <p>{item.name} - BD{item.price}</p>
+      <button onClick ={()=>{handleRemoveFromCart(item)}}>Remove from Cart</button>
+
+    </div>
+  ))
+)}
+{warningMessage && <p style={{ color: "red" }}>{warningMessage}</p>}
 </div>
   );
+
 }
 
 export default App
